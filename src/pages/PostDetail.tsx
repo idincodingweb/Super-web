@@ -11,6 +11,7 @@ interface Post {
   category: string;
   created_at: string;
   image_url: string;
+  views: number;
 }
 
 interface Comment {
@@ -36,44 +37,55 @@ const PostDetail = () => {
     if (id) {
       fetchPost();
       fetchComments();
-      trackPageView();
+      
     }
     window.scrollTo(0, 0);
   }, [id]);
 
+  useEffect(() => {
+    if(post){
+      trackPageView();
+    }
+  }, [post])
+
   const trackPageView = async () => {
     if (!id) return;
 
-    // Update total views in posts table
-    await supabase
-      .from('posts')
-      .update({ views: post ? post.views + 1 : 1 })
-      .eq('id', id);
+    // Update total views in posts table (asumsi ini jalan terus)
+    if(post){
+      await supabase
+        .from('posts')
+        .update({ views: post.views + 1 })
+        .eq('id', id);
+    }
+
 
     // Track daily views
     const today = new Date().toISOString().split('T')[0];
-    
+
     // First try to update existing record
-    const { data } = await supabase
+    const { data: existingView, error: viewError } = await supabase
       .from('post_views')
       .select('*')
       .eq('post_id', id)
       .eq('date', today)
       .single();
 
-    if (data) {
+    if (viewError) {
+      console.error("Error fetching view count", viewError)
+    }
+
+    if (existingView) {
       // Update existing record
       await supabase
         .from('post_views')
-        .update({ views: data.views + 1 })
-        .eq('id', data.id);
+        .update({ views: existingView.views + 1 })
+        .eq('id', existingView.id);
     } else {
       // Create new record
       await supabase
         .from('post_views')
-        .insert([
-          { post_id: id, date: today, views: 1 }
-        ]);
+        .insert([{ post_id: id, date: today, views: 1 }]);
     }
   };
 
@@ -117,10 +129,10 @@ const PostDetail = () => {
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!id) return;
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('comments')
       .insert([
         {
@@ -221,7 +233,7 @@ const PostDetail = () => {
         {/* Comments Section */}
         <div>
           <h2 className="text-2xl font-bold mb-8">Comments</h2>
-          
+
           {/* Comment Form */}
           <form onSubmit={handleCommentSubmit} className="mb-12">
             <div className="mb-4">
