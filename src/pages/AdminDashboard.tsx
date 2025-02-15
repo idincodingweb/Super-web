@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
-import { Trash2, Plus, MessageSquare, Search, Tags, X, ChevronLeft, ChevronRight, LogOut, Eye, RefreshCcw, ChartBar, Squircle } from 'lucide-react';
+import { Plus, MessageSquare, Search, Tags, X, LogOut, RefreshCcw, ChartBar, Squircle } from 'lucide-react'; // Icon yang (mungkin) digunakan
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Types
@@ -12,7 +12,7 @@ interface Post {
   content: string;
   category: string;
   created_at: string;
-  views: number;
+  views: number; // Property views ditambahkan
   image_url: string;
 }
 
@@ -139,7 +139,8 @@ const AdminDashboard = () => {
           title: newPost.title,
           content: newPost.content,
           category: newPost.category,
-          image_url: newPost.image_url
+          image_url: newPost.image_url,
+          views: 0 // Nilai default untuk views saat membuat postingan baru
         }]);
 
       if (error) throw error;
@@ -164,7 +165,8 @@ const AdminDashboard = () => {
           title: post.title,
           content: post.content,
           category: post.category,
-          image_url: post.image_url
+          image_url: post.image_url,
+          views: post.views
         })
         .eq('id', post.id);
 
@@ -223,7 +225,8 @@ const AdminDashboard = () => {
           title: `${newCategory} Category`,
           content: `Welcome to the ${newCategory} category.`,
           category: newCategory.trim(),
-          image_url: 'https://picsum.photos/800/400'
+          image_url: 'https://picsum.photos/800/400',
+          views: 0 // Nilai default untuk views saat membuat kategori baru
         }]);
 
       if (error) throw error;
@@ -405,14 +408,12 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
                           onClick={() => setEditingPost(post)}
-                          className="text-blue-600 hover:text-blue-900 mr-4 transition-colors duration-200"
-                        >
+                          className="text-blue-600 hover:text-blue-900 mr-4 transition-colors duration-200">
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeletePost(post.id)}
-                          className="text-red-600 hover:text-red-900 transition-colors duration-200"
-                        >
+                          className="text-red-600 hover:text-red-900 transition-colors duration-200">
                           Delete
                         </button>
                       </td>
@@ -438,8 +439,7 @@ const AdminDashboard = () => {
                     </div>
                     <button
                       onClick={() => setSelectedComment(comment)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
+                      className="text-blue-600 hover:text-blue-800">
                       Reply
                     </button>
                   </div>
@@ -463,8 +463,7 @@ const AdminDashboard = () => {
                 <h2 className="text-lg font-medium">Views Over Time</h2>
                 <button
                   onClick={fetchViewsData}
-                  className="text-blue-600 hover:text-blue-800"
-                >
+                  className="text-blue-600 hover:text-blue-800">
                   <RefreshCcw size={20} />
                 </button>
               </div>
@@ -495,8 +494,7 @@ const AdminDashboard = () => {
               />
               <button
                 onClick={handleAddCategory}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 <Plus size={20} />
                 Add Category
               </button>
@@ -526,8 +524,7 @@ const AdminDashboard = () => {
               <h2 className="text-xl font-bold">Create New Post</h2>
               <button
                 onClick={() => setShowNewPostModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
+                className="text-gray-500 hover:text-gray-700">
                 <X size={24} />
               </button>
             </div>
@@ -609,7 +606,6 @@ const AdminDashboard = () => {
       )}
 
       {/* Edit Post Modal */}
-      {/* Edit Post Modal */}
       {editingPost && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full p-6">
@@ -617,8 +613,7 @@ const AdminDashboard = () => {
               <h2 className="text-xl font-bold">Edit Post</h2>
               <button
                 onClick={() => setEditingPost(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
+                className="text-gray-500 hover:text-gray-700">
                 <X size={24} />
               </button>
             </div>
@@ -711,8 +706,7 @@ const AdminDashboard = () => {
                   setSelectedComment(null);
                   setAdminReply('');
                 }}
-                className="text-gray-500 hover:text-gray-700"
-              >
+                className="text-gray-500 hover:text-gray-700">
                 <X size={24} />
               </button>
             </div>
