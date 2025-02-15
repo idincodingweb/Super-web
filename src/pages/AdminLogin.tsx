@@ -10,14 +10,15 @@ const AdminLogin = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const { data, error } = await supabase.auth.signInWithPassword({
+
+    // Hapus deklarasi variabel data
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      setError(error.message);
+    if (authError) {
+      setError(authError.message);
     } else {
       navigate('/admin/dashboard');
     }
